@@ -1,0 +1,33 @@
+{
+  "id": "./",
+  "name": "HelloTodo 待办小站",
+  "short_name": "HelloTodo",
+  "description": "Hello Kitty 风格的待办提醒：DDL 倒计时、星级排序、过期墓碑、DDL 日历、统计面板",
+  "lang": "zh-CN",
+  "start_url": "./",
+  "scope": "./",
+  "display": "standalone",
+  "orientation": "portrait",
+  "theme_color": "#E60012",
+  "background_color": "#FFF6F8",
+  "icons": [
+    {
+      "src": "icons/icon-192.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "any"
+    },
+    {
+      "src": "icons/icon-512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any maskable"
+    },
+    {
+      "src": "icons/icon.svg",
+      "sizes": "any",
+      "type": "image/svg+xml",
+      "purpose": "any"
+    }
+  ]
+}

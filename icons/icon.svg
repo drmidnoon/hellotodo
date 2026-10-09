@@ -1,0 +1,30 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512">
+  <!-- 圆角粉底 -->
+  <rect width="512" height="512" rx="112" fill="#FFD1DC"/>
+  <!-- 左耳 -->
+  <path d="M150 198 L126 62 L254 148 Z" fill="#FFFFFF" stroke="#E60012" stroke-width="15" stroke-linejoin="round"/>
+  <!-- 右耳 -->
+  <path d="M362 198 L386 62 L258 148 Z" fill="#FFFFFF" stroke="#E60012" stroke-width="15" stroke-linejoin="round"/>
+  <!-- 头 -->
+  <circle cx="256" cy="274" r="150" fill="#FFFFFF" stroke="#E60012" stroke-width="15"/>
+  <!-- 眼睛 -->
+  <ellipse cx="196" cy="262" rx="13" ry="19" fill="#4A2B32"/>
+  <ellipse cx="316" cy="262" rx="13" ry="19" fill="#4A2B32"/>
+  <!-- 鼻子 -->
+  <ellipse cx="256" cy="306" rx="12" ry="9" fill="#FFB300"/>
+  <!-- 胡须 -->
+  <g stroke="#4A2B32" stroke-width="8" stroke-linecap="round">
+    <line x1="152" y1="292" x2="92" y2="280"/>
+    <line x1="152" y1="316" x2="90" y2="318"/>
+    <line x1="152" y1="340" x2="94" y2="354"/>
+    <line x1="360" y1="292" x2="420" y2="280"/>
+    <line x1="360" y1="316" x2="422" y2="318"/>
+    <line x1="360" y1="340" x2="418" y2="354"/>
+  </g>
+  <!-- 蝴蝶结（左耳旁，Hello Kitty 标志性元素） -->
+  <circle cx="144" cy="148" r="48" fill="#E60012"/>
+  <circle cx="208" cy="148" r="48" fill="#E60012"/>
+  <circle cx="176" cy="148" r="20" fill="#FF6B7A"/>
+  <circle cx="144" cy="148" r="8" fill="#FFFFFF"/>
+  <circle cx="208" cy="148" r="8" fill="#FFFFFF"/>
+</svg>

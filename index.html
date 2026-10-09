@@ -1,0 +1,213 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover, interactive-widget=resizes-content">
+  <meta name="theme-color" content="#E60012">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="default">
+  <meta name="apple-mobile-web-app-title" content="HelloTodo">
+  <meta name="description" content="HelloTodo —— Hello Kitty 风格的待办提醒小站">
+  <title>HelloTodo 🎀 待办小站</title>
+  <link rel="manifest" href="manifest.json">
+  <link rel="icon" href="icons/icon.svg" type="image/svg+xml">
+  <link rel="apple-touch-icon" href="icons/icon-192.png">
+  <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+
+  <!-- ===== 顶部 ===== -->
+  <header class="app-header">
+    <div class="logo" id="logo">
+      <img src="icons/icon.svg" alt="HelloTodo 图标" class="logo-img">
+      <span class="logo-name">HelloTodo</span>
+    </div>
+    <div class="header-actions">
+      <button class="icon-btn" id="btn-trash" title="回收站" aria-label="回收站">🗑️</button>
+      <button class="icon-btn" id="btn-settings" title="设置" aria-label="设置">⚙️</button>
+    </div>
+  </header>
+
+  <!-- ===== 主内容区 ===== -->
+  <main id="app">
+
+    <!-- 待办 -->
+    <section class="view is-active" id="view-todo">
+      <div id="big-events"></div>
+      <div id="todo-list"></div>
+      <div id="overdue-spot"></div>
+    </section>
+
+    <!-- DDL 日历 -->
+    <section class="view" id="view-calendar">
+      <div class="cal-header">
+        <button class="icon-btn" id="cal-prev" aria-label="上个月">◀</button>
+        <span class="cal-month-label" id="cal-month-label"></span>
+        <button class="icon-btn" id="cal-next" aria-label="下个月">▶</button>
+      </div>
+      <div class="cal-weekdays">
+        <span>一</span><span>二</span><span>三</span><span>四</span><span>五</span><span class="wk">六</span><span class="wk">日</span>
+      </div>
+      <div class="cal-grid" id="cal-grid"></div>
+      <div class="cal-day-title" id="cal-day-title"></div>
+      <div class="cal-timeline" id="cal-timeline"></div>
+    </section>
+
+    <!-- 已过期 -->
+    <section class="view" id="view-overdue">
+      <div class="view-hint">🪦 这些任务已经过了 DDL 还没勾选。过期 7 天会自动进回收站。</div>
+      <div id="overdue-list"></div>
+    </section>
+
+    <!-- 已完成 -->
+    <section class="view" id="view-done">
+      <div class="view-hint">✅ 勾选完成的任务在这里存放 3 天，之后自动消失。</div>
+      <div id="done-list"></div>
+    </section>
+
+    <!-- 统计 -->
+    <section class="view" id="view-stats">
+      <div id="stats-root"></div>
+    </section>
+
+  </main>
+
+  <!-- ===== 添加按钮 ===== -->
+  <button id="fab" aria-label="添加待办" title="添加待办">
+    <svg viewBox="0 0 24 24" class="fab-plus"><path d="M11 5h2v6h6v2h-6v6h-2v-6H5v-2h6z"/></svg>
+    <span class="fab-bow">🎀</span>
+  </button>
+
+  <!-- ===== 底部导航 ===== -->
+  <nav class="bottom-nav" id="bottom-nav">
+    <button class="nav-item is-active" data-view="todo"><span class="nav-ico">📌</span><span class="nav-txt">待办</span></button>
+    <button class="nav-item" data-view="calendar"><span class="nav-ico">📅</span><span class="nav-txt">日历</span></button>
+    <button class="nav-item" data-view="overdue"><span class="nav-ico">🪦</span><span class="nav-txt">已过期</span><span class="nav-badge" id="badge-overdue" hidden></span></button>
+    <button class="nav-item" data-view="done"><span class="nav-ico">✅</span><span class="nav-txt">已完成</span></button>
+    <button class="nav-item" data-view="stats"><span class="nav-ico">📊</span><span class="nav-txt">统计</span></button>
+  </nav>
+
+  <!-- ===== 添加/编辑 底部抽屉 ===== -->
+  <div class="sheet-mask" id="sheet-mask" hidden></div>
+  <div class="sheet" id="sheet" hidden role="dialog" aria-modal="true" aria-labelledby="sheet-title">
+    <div class="sheet-handle"></div>
+    <h2 class="sheet-title" id="sheet-title">🎀 添加待办</h2>
+    <form id="task-form" autocomplete="off">
+      <input type="hidden" id="f-id">
+
+      <label class="field-label" for="f-category">任务所属（如：文体部）</label>
+      <input type="text" id="f-category" class="text-input" list="category-history" placeholder="例如：文体部">
+      <datalist id="category-history"></datalist>
+
+      <label class="field-label" for="f-title">具体任务 <span class="req">*</span></label>
+      <input type="text" id="f-title" class="text-input" placeholder="例如：写运动会新闻稿" required>
+
+      <!-- 已完成进度：暂不启用，等用一段时间再定方案 -->
+      <div id="f-progress-slot" hidden></div>
+
+      <label class="field-label" for="f-ddl">DDL（截止时间）<span class="req">*</span></label>
+      <input type="datetime-local" id="f-ddl" class="text-input" required>
+      <div class="field-tip" id="f-ddl-tip"></div>
+
+      <label class="field-label">重要星级（默认 1 星）</label>
+      <div class="star-input" id="f-stars" role="radiogroup" aria-label="重要星级">
+        <button type="button" class="star" data-star="1" aria-label="1星">★</button>
+        <button type="button" class="star" data-star="2" aria-label="2星">★</button>
+        <button type="button" class="star" data-star="3" aria-label="3星">★</button>
+        <button type="button" class="star" data-star="4" aria-label="4星">★</button>
+        <button type="button" class="star" data-star="5" aria-label="5星">★</button>
+      </div>
+
+      <label class="field-label" for="f-tags">标签（回车添加，如：紧急）</label>
+      <input type="text" id="f-tags" class="text-input" placeholder="输入后按回车，可选">
+      <div class="chip-row" id="f-tag-chips"></div>
+
+      <label class="field-label">子任务（可选）</label>
+      <div id="f-subtasks"></div>
+      <button type="button" class="mini-btn" id="btn-add-subtask">＋ 添加子任务</button>
+
+      <div class="form-switches">
+        <label class="switch-row">
+          <span>🎉 设为大事件（置顶倒计时卡片）</span>
+          <input type="checkbox" id="f-big">
+        </label>
+        <label class="switch-row">
+          <span>🔁 重复任务</span>
+          <select id="f-repeat" class="mini-select">
+            <option value="">不重复</option>
+            <option value="day">每天</option>
+            <option value="week">每周</option>
+            <option value="month">每月</option>
+          </select>
+        </label>
+      </div>
+
+      <label class="field-label" for="f-note">备注（可选）</label>
+      <textarea id="f-note" class="text-input note-area" rows="2" placeholder="备注（可选）"></textarea>
+
+      <div class="sheet-actions">
+        <button type="button" class="btn danger" id="btn-delete" hidden>🗑️ 删除</button>
+        <button type="button" class="btn ghost" id="btn-cancel">取消</button>
+        <button type="submit" class="btn primary" id="btn-save">💾 保存待办</button>
+      </div>
+    </form>
+  </div>
+
+  <!-- ===== 回收站抽屉 ===== -->
+  <div class="sheet-mask" id="trash-mask" hidden></div>
+  <div class="sheet" id="trash-sheet" hidden role="dialog" aria-modal="true" aria-labelledby="trash-title">
+    <div class="sheet-handle"></div>
+    <h2 class="sheet-title" id="trash-title">🗑️ 回收站</h2>
+    <div class="view-hint">回收站里的任务保留 30 天，之后彻底删除。</div>
+    <div id="trash-list"></div>
+    <div class="sheet-actions">
+      <button class="btn ghost" id="btn-trash-close">关闭</button>
+      <button class="btn danger" id="btn-empty-trash">清空回收站</button>
+    </div>
+  </div>
+
+  <!-- ===== 设置抽屉 ===== -->
+  <div class="sheet-mask" id="settings-mask" hidden></div>
+  <div class="sheet" id="settings-sheet" hidden role="dialog" aria-modal="true" aria-labelledby="settings-title">
+    <div class="sheet-handle"></div>
+    <h2 class="sheet-title" id="settings-title">⚙️ 设置</h2>
+
+    <label class="switch-row">
+      <span>🔔 勾选完成音效</span>
+      <input type="checkbox" id="set-sound" checked>
+    </label>
+    <label class="switch-row">
+      <span>📳 勾选完成震动</span>
+      <input type="checkbox" id="set-vibrate" checked>
+    </label>
+    <label class="switch-row">
+      <span>✋ 手动拖拽排序</span>
+      <input type="checkbox" id="set-manual">
+    </label>
+
+    <div class="settings-group">
+      <button class="btn ghost wide" id="btn-export">📤 导出数据备份</button>
+      <button class="btn ghost wide" id="btn-import">📥 导入数据备份</button>
+      <input type="file" id="file-import" accept="application/json" hidden>
+      <button class="btn danger wide" id="btn-clear-all">🗑️ 清空全部数据</button>
+    </div>
+
+    <div class="about-box" id="about-text">
+      <p><strong>HelloTodo v1.0.0</strong> 🎀</p>
+      <p>纯前端 PWA · 数据只存在你自己的浏览器里</p>
+      <p>互相独立、互不可见 · 开源项目</p>
+    </div>
+  </div>
+
+  <!-- 全局提示 -->
+  <div id="toast" hidden></div>
+
+  <script src="js/util.js"></script>
+  <script src="js/store.js"></script>
+  <script src="js/anim.js"></script>
+  <script src="js/calendar.js"></script>
+  <script src="js/stats.js"></script>
+  <script src="js/ui.js"></script>
+  <script src="js/app.js"></script>
+</body>
+</html>
